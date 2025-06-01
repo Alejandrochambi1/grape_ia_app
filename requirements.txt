@@ -1,37 +1,27 @@
 Flask==2.3.3
-gunicorn # ¡ESENCIAL para Render!
-numpy==1.26.4 # O la versión que usaste con Python 3.11 y TF
-opencv-python-headless==4.8.0.76 # headless es más ligero
-scikit-image==0.20.0 # O la versión que te funcionó con 3.11
-scikit-learn==1.4.2  # O la versión que usaste
-scipy==1.11.4        # O la versión compatible
-tensorflow-cpu==2.15.0 # O la última versión de TF-CPU compatible con Python 3.11
-                       # TF 2.13 es compatible con Python <=3.11
-                       # TF 2.15 es compatible con Python <=3.11
-                       # TF 2.16+ podría requerir Python 3.9-3.11 pero no más nuevos.
-                       # ¡Verifica la compatibilidad de TF con tu Python!
+gunicorn
+numpy==1.26.4 
+opencv-python-headless==4.8.0.76
+scikit-image==0.20.0
+scikit-learn==1.4.2
+scipy==1.11.4
 
-# Dependencias que TensorFlow-CPU podría necesitar explícitamente a veces:
-absl-py
-astunparse
-flatbuffers
-gast
-google-pasta
-grpcio
-h5py
-keras # Solo si importas 'keras' directamente y no 'tensorflow.keras'. TF 2.15 ya tiene Keras 3.
-libclang # Si alguna dependencia lo necesita indirectamente, aunque es raro para inferencia.
-Markdown # Solo si Flask o alguna extensión lo usa para algo.
+keras==3.8.0 
+tensorflow-cpu==2.16.1 # O 2.17.0 si encuentras una versión CPU estable.
+                       # Esta versión de TF es para asegurar que el backend de TF está disponible para Keras 3.
+
+# Dependencias mínimas adicionales (Keras 3 y TF las traerán si las necesitan explícitamente)
+h5py # Keras lo usa para guardar/cargar
+packaging # Keras 3 lo usa
+# ml-dtypes # Keras 3 lo usa
+# namex # Keras 3 lo usa
+# optree # Keras 3 lo usa
+# rich # Keras 3 lo usa
+
+# Dependencias de Flask
 MarkupSafe
-ml-dtypes
-opt_einsum
-packaging
-protobuf # TF suele requerir una versión específica o un rango.
-six
-termcolor
-typing_extensions
-Werkzeug # Flask lo necesita.
-wrapt
-# Considera quitar las que no sean estrictamente necesarias para la inferencia
-# por ejemplo, matplotlib, seaborn, kagglehub, pydotplus, graphviz
-# a menos que generes gráficos en el servidor, lo cual no parece ser el caso.
+Werkzeug
+itsdangerous # Añadido porque Flask lo necesita, usualmente viene con Flask
+Jinja2 # Añadido porque Flask lo necesita, usualmente viene con Flask
+click # Añadido porque Flask lo necesita, usualmente viene con Flask
+blinker # Añadido porque Flask lo necesita, usualmente viene con Flask

@@ -1,35 +1,47 @@
 # --- START OF FILE app.py ---
+
+# 1. Configurar el backend de Keras (puede no ser estrictamente necesario si solo usas tf.keras de TF>=2.16)
 import os
+# os.environ['KERAS_BACKEND'] = 'tensorflow' # Podrías probar sin esto primero si solo usas tf.keras
+
+# 2. Imports estándar de Python y Flask
 import json
 import numpy as np
 import pickle
 from flask import Flask, request, render_template, jsonify
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.applications.efficientnet import preprocess_input as efficientnet_preprocess_input
 import cv2
-import io # Necesario para np.frombuffer si lees de un stream en algún momento
-import base64 # No se usa directamente aquí, pero podría ser útil para enviar imágenes
+import io
 
-# Para características avanzadas (deben coincidir con las usadas en Colab)
+# 3. Imports de Keras y TensorFlow (asumiendo que TF >= 2.16 provee Keras 3)
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array # Para TF < 2.9; para TF >= 2.9 / Keras 3 podría ser keras.utils.image_utils.img_to_array
+                                                           # o simplemente keras.utils.img_to_array si tienes 'keras' independiente.
+                                                           # Dado TF 2.16+, tf.keras.utils.img_to_array es más probable
+from tensorflow.keras.utils import img_to_array as tf_img_to_array # Usar un alias si hay conflicto
+from tensorflow.keras.applications.efficientnet import preprocess_input as efficientnet_preprocess_input
+print("INFO: Usando imports de tensorflow.keras.")
+
+# 4. Imports de scikit-image y scipy
 from skimage.feature import graycomatrix, graycoprops, local_binary_pattern
 from skimage.filters import gabor
 from skimage.segmentation import slic
-from skimage.measure import regionprops # 'label' no se usa directamente en analisis_avanzado_pixeles_local
-from skimage.morphology import disk, opening # 'closing' no se usa
+from skimage.measure import regionprops
+from skimage.morphology import disk, opening
 from scipy import ndimage
-from expert_system_class import SistemaExpertoAvanzado # ASUMIENDO que el archivo se llama expert_system_class.py
 
-# --- Variables Globales y Configuración ---
+# 5. Import de tu clase personalizada
+from expert_system_class import SistemaExpertoAvanzado
+
+# --- Variables Globales y Configuración de la Aplicación Flask ---
 app = Flask(__name__)
+UPLOAD_FOLDER = 'static/uploads'
+MODELS_BASE_PATH = 'models'
 
-UPLOAD_FOLDER = 'static/uploads' # Aunque no guardemos permanentemente, Flask podría usarlo para el objeto 'archivo'
-MODELS_BASE_PATH = 'models'     # Ruta a la carpeta de modelos relativa a app.py
-
-# Crear carpetas si no existen (útil para desarrollo local, Render las tendrá del repo)
+# Crear carpetas si no existen (principalmente para desarrollo local)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-# La carpeta 'models' debería existir en tu repositorio y ser copiada por Render
+# La carpeta 'models' debe existir en tu repositorio
 
+# Variables globales para almacenar los modelos y artefactos cargados
 modelo_cnn_global = None
 modelo_arbol_decision_global = None
 sistema_experto_global = None
