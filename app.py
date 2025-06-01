@@ -78,16 +78,17 @@ def cargar_todos_los_modelos():
         # Sistema Experto (DESPUÉS de feature_names y mapeo)
         sistema_experto_path = os.path.join(models_path_abs, "sistema_experto_obj.pkl")
         print(f"Intentando cargar sistema_experto_obj desde: {sistema_experto_path}")
-        if os.path.exists(sistema_experto_path):
+        if os.path.exists(sistema_experto_path):            
              with open(sistema_experto_path, 'rb') as f:
                 sistema_experto_global = pickle.load(f)
-             if hasattr(sistema_experto_global, 'feature_names') and feature_names_list_global:
-                sistema_experto_global.feature_names = feature_names_list_global # Asegurar que tenga los feature_names correctos
+             if feature_names_list_global and hasattr(sistema_experto_global, 'feature_names'):
+                sistema_experto_global.feature_names = feature_names_list_global
+                print("INFO: feature_names reasignados al objeto SistemaExperto cargado.")
              print("✓ Sistema Experto cargado desde archivo.")
              models_loaded_status['expert'] = True
-        elif feature_names_list_global: 
+        elif feature_names_list_global:
+            print(f"INFO: Archivo {sistema_experto_path} no encontrado. Inicializando SistemaExperto desde clase.") 
             sistema_experto_global = SistemaExpertoAvanzado(feature_names_list_global)
-            print("✓ Sistema Experto inicializado (sin .pkl, usando clase y feature_names).")
             models_loaded_status['expert'] = True
         else:
             print(f"⚠️ FALLO: Sistema Experto no pudo ser cargado (no existe {sistema_experto_path}) ni inicializado (faltan feature_names).")
