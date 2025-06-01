@@ -1,0 +1,31 @@
+# Entornos virtuales
+venv/
+env/
+*.venv
+.env
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de IDEs
+.vscode/
+.idea/
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Mantener la carpeta uploads pero ignorar su contenido
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Archivos de logs
+*.log
+
+# Archivos específicos de Colab (si los tuvieras)
+.ipynb_checkpoints/
+
+# NO ignorar la carpeta models, los necesitamos en el servidor
+# #models/

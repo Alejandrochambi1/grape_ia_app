@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍇 Detector IA de Enfermedades en Uvas - GrapeAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍇</text></svg>">
+</head>
+<body>
+    <!-- Contenedor para Partículas de fondo -->
+    <div id="particles-js"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-leaf"></i>
+                <span>GrapeAI</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">Inicio</a>
+                <a href="#detector" class="nav-link">Detector</a>
+                <a href="#about" class="nav-link">Acerca De</a>
+                <a href="#results" class="nav-link">Resultados</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Detección Inteligente</span>
+                    <br>de Enfermedades en Uvas
+                </h1>
+                <p class="hero-subtitle">
+                    Un sistema avanzado de Inteligencia Artificial que combina redes neuronales, árboles de decisión
+                    y sistemas expertos para diagnosticar con alta precisión enfermedades en plantas de uva.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="scrollToDetector()">
+                        <i class="fas fa-camera-retro"></i>
+                        Analizar Imagen Ahora
+                    </button>
+                    <button class="btn btn-secondary" onclick="showDemo()">
+                        <i class="fas fa-play-circle"></i>
+                        Ver Demostración
+                    </button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-card">
+                    <div class="card-3d">
+                        <div class="card-face card-front">
+                            <i class="fas fa-microscope"></i>
+                            <h3>Análisis Profundo de Píxeles</h3>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Identificando patrones invisibles al ojo humano.</p>
+                        </div>
+                         <div class="card-face card-back">
+                            <div class="tech-stats">
+                                <div class="stat">
+                                    <span class="stat-number">95%+</span>
+                                    <span class="stat-label">Precisión</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number">3 IA</span>
+                                    <span class="stat-label">Técnicas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tech-indicators">
+                <div class="tech-item" data-tech="cnn" title="Red Neuronal Convolucional">
+                    <div class="tech-icon"><i class="fas fa-brain"></i></div>
+                    <span>Red Neuronal</span>
+                </div>
+                <div class="tech-item" data-tech="tree" title="Árbol de Decisión">
+                    <div class="tech-icon"><i class="fas fa-sitemap"></i></div>
+                    <span>Árbol Decisión</span>
+                </div>
+                <div class="tech-item" data-tech="expert" title="Sistema Experto">
+                    <div class="tech-icon"><i class="fas fa-user-cog"></i></div>
+                    <span>Sistema Experto</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="detector" class="detector-section">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-search-plus"></i>
+                Detector de Enfermedades
+            </h2>
+            <p style="text-align: center; max-width: 700px; margin: -2rem auto 3rem; color: var(--text-color-medium);">
+                Sube una fotografía clara de una hoja de uva y nuestro sistema de IA la analizará en segundos para identificar posibles enfermedades.
+            </p>
+
+            <div class="detector-container">
+                <div class="upload-panel">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <h3>Sube una Imagen de Hoja de Uva</h3>
+                            <p>Arrastra y suelta el archivo aquí o haz clic para seleccionar.</p>
+                            <input type="file" id="imageInput" accept="image/jpeg, image/png, image/webp" hidden>
+                            <button class="btn btn-upload" onclick="document.getElementById('imageInput').click()">
+                                <i class="fas fa-file-image"></i> Seleccionar Archivo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                         <img id="previewImg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZmYxIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJQb3BwaW5zLCBBcmlhbCIgZm9udC1zaXplPSIxNnB4IiBmaWxsPSIjYWRhZGIzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Vista Previa</text></svg>" alt="Vista previa de la imagen">
+                        <div class="preview-overlay">
+                            <button class="btn btn-analyze" id="analyzeBtn">
+                                <i class="fas fa-cogs"></i>
+                                Analizar Ahora
+                            </button>
+                            <button class="btn btn-change" onclick="changeImage()">
+                                <i class="fas fa-exchange-alt"></i>
+                                Cambiar Imagen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-panel">
+                    <div class="analysis-header">
+                        <h3><i class="fas fa-chart-bar"></i> Progreso del Análisis</h3>
+                        <div class="status-indicator" id="statusIndicator">
+                            <span class="status-dot"></span>
+                            <span id="statusText">Esperando imagen...</span>
+                        </div>
+                    </div>
+
+                    <div class="analysis-progress" id="analysisProgress" style="display: none;">
+                        <div class="progress-step" data-step="1">
+                            <div class="step-icon"><i class="fas fa-upload"></i></div>
+                            <span>Cargando</span>
+                        </div>
+                        <div class="progress-step" data-step="2">
+                            <div class="step-icon"><i class="fas fa-brain"></i></div>
+                            <span>Red Neuronal</span>
+                        </div>
+                        <div class="progress-step" data-step="3">
+                            <div class="step-icon"><i class="fas fa-sitemap"></i></div>
+                            <span>Árbol Decisión</span>
+                        </div>
+                        <div class="progress-step" data-step="4">
+                            <div class="step-icon"><i class="fas fa-user-cog"></i></div>
+                            <span>Sis. Experto</span>
+                        </div>
+                        <div class="progress-step" data-step="5">
+                            <div class="step-icon"><i class="fas fa-flag-checkered"></i></div>
+                            <span>Resultado</span>
+                        </div>
+                    </div>
+
+                    <div class="features-viz" id="featuresViz" style="display: none;">
+                        <h4>Características Visuales Clave</h4>
+                        <div class="feature-grid">
+                            <div class="feature-item">
+                                <span class="feature-label">Píxeles Oscuros (Necrosis)</span>
+                                <div class="feature-bar-container">
+                                    <div class="feature-bar"><div class="feature-fill" id="blackPixels"></div></div>
+                                    <span class="feature-value" id="blackPixelsValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-label">Píxeles Verdes (Salud)</span>
+                                <div class="feature-bar-container">
+                                    <div class="feature-bar"><div class="feature-fill" id="greenPixels"></div></div>
+                                    <span class="feature-value" id="greenPixelsValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-label">Densidad de Bordes (Textura)</span>
+                                 <div class="feature-bar-container">
+                                    <div class="feature-bar"><div class="feature-fill" id="edgeDensity"></div></div>
+                                    <span class="feature-value" id="edgeDensityValue">0%</span>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-label">Complejidad (Regiones)</span>
+                                 <div class="feature-bar-container">
+                                    <div class="feature-bar"><div class="feature-fill" id="texture"></div></div>
+                                    <span class="feature-value" id="textureValue">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results" class="results-section" style="display: none;">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-clipboard-check"></i>
+                Resultados del Diagnóstico
+            </h2>
+
+            <div class="results-container">
+                <div class="main-diagnosis">
+                    <div class="diagnosis-card">
+                        <div class="diagnosis-icon" id="diagnosisIcon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="diagnosis-content">
+                            <h3 id="diagnosisTitle">Diagnóstico Pendiente</h3>
+                            <p id="diagnosisDescription">Esperando análisis para mostrar descripción.</p>
+                            <div class="confidence-meter">
+                                <span>Confianza General:</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" id="confidenceFill"></div>
+                                </div>
+                                <span id="confidenceValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="systems-results">
+                    <div class="system-result" id="cnnResultCard">
+                        <div class="system-header">
+                            <i class="fas fa-brain"></i>
+                            <h4>Red Neuronal (CNN)</h4>
+                        </div>
+                        <div class="system-content">
+                            <div class="prediction" id="cnnPrediction">-</div>
+                            <div class="confidence" id="cnnConfidence">0%</div>
+                            <div class="probabilities" id="cnnProbabilities">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-result" id="treeResultCard">
+                        <div class="system-header">
+                            <i class="fas fa-sitemap"></i>
+                            <h4>Árbol de Decisión</h4>
+                        </div>
+                        <div class="system-content">
+                            <div class="prediction" id="treePrediction">-</div>
+                            <div class="confidence" id="treeConfidence">0%</div>
+                            <div class="features-used" id="treeFeatures">
+                                <p>Analizando características de textura y color.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="system-result" id="expertResultCard">
+                        <div class="system-header">
+                            <i class="fas fa-user-cog"></i>
+                            <h4>Sistema Experto</h4>
+                        </div>
+                        <div class="system-content">
+                            <div class="prediction" id="expertPrediction">-</div>
+                            <div class="confidence" id="expertConfidence">0%</div>
+                            <div class="rules-applied" id="expertRules">
+                                <p>Aplicando reglas basadas en conocimiento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h4><i class="fas fa-lightbulb"></i> Recomendaciones Sugeridas</h4>
+                    <div class="recommendations-content" id="recommendationsContent">
+                        <p>Las recomendaciones aparecerán aquí después del análisis.</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="downloadReport()">
+                        <i class="fas fa-download"></i>
+                        Descargar Reporte
+                    </button>
+                    <button class="btn btn-secondary" onclick="analyzeAnother()">
+                        <i class="fas fa-redo-alt"></i>
+                        Analizar Otra
+                    </button>
+                    <button class="btn btn-info" onclick="shareResults()">
+                        <i class="fas fa-share-alt"></i>
+                        Compartir Resultado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Acerca de GrapeAI
+            </h2>
+            <p style="text-align: center; max-width: 800px; margin: -2rem auto 3.5rem; color: var(--text-color-medium);">
+                GrapeAI es un proyecto innovador que fusiona múltiples técnicas de Inteligencia Artificial para ofrecer una herramienta robusta y precisa para la detección temprana de enfermedades en vides. Nuestro objetivo es ayudar a agricultores y entusiastas a mantener sus cultivos saludables.
+            </p>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="card-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Red Neuronal Convolucional</h3>
+                    <p>Utiliza una arquitectura EfficientNetB0, pre-entrenada en ImageNet y ajustada (fine-tuning) específicamente para las enfermedades de la uva. Analiza patrones visuales complejos directamente de los píxeles de la imagen.</p>
+                    <ul>
+                        <li>Análisis de imágenes a 224x224 píxeles</li>
+                        <li>Capacidad de aprendizaje profundo</li>
+                        <li>Alta precisión en identificación visual</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <div class="card-icon"><i class="fas fa-sitemap"></i></div>
+                    <h3>Árbol de Decisión</h3>
+                    <p>Este modelo clasifica las enfermedades basándose en un conjunto de más de 70 características extraídas de la imagen, incluyendo métricas de color (RGB, HSV), textura (GLCM, LBP), forma y propiedades morfológicas.</p>
+                    <ul>
+                        <li>Características interpretables</li>
+                        <li>Análisis estadístico de imagen</li>
+                        <li>Modelo basado en reglas explícitas</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <div class="card-icon"><i class="fas fa-user-cog"></i></div>
+                    <h3>Sistema Experto</h3>
+                    <p>Implementa un conjunto de reglas heurísticas definidas por expertos, que emulan el proceso de razonamiento de un agrónomo al observar síntomas específicos y combinaciones de características visuales.</p>
+                    <ul>
+                        <li>Conocimiento de dominio codificado</li>
+                        <li>Diagnóstico basado en umbrales</li>
+                        <li>Explicaciones basadas en reglas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diseases-info">
+                <h3>Enfermedades Comunes Detectadas</h3>
+                <div class="diseases-grid">
+                    <div class="disease-card" data-disease="black-rot">
+                        <div class="disease-image"><i class="fas fa-circle" style="color: #3E2723;"></i></div>
+                        <h4>Pudrición Negra (Black Rot)</h4>
+                        <p>Causada por el hongo <i>Guignardia bidwellii</i>. Se manifiesta como pequeñas manchas circulares de color marrón claro que luego se agrandan y oscurecen, a menudo con un halo más claro. Los frutos se momifican.</p>
+                    </div>
+
+                    <div class="disease-card" data-disease="esca">
+                        <div class="disease-image"><i class="fas fa-circle" style="color: #FFB300;"></i></div>
+                        <h4>Yesca (Esca)</h4>
+                        <p>Un complejo de enfermedades causadas por varios hongos que afectan la madera. Los síntomas foliares incluyen manchas cloróticas (amarillentas) entre las nervaduras, que luego se necrosan (vuelven marrones), dando un aspecto atigrado.</p>
+                    </div>
+
+                    <div class="disease-card" data-disease="leaf-blight">
+                        <div class="disease-image"><i class="fas fa-circle" style="color: #D32F2F;"></i></div>
+                        <h4>Tizón Foliar (Leaf Blight)</h4>
+                        <p>Generalmente causado por <i>Pseudopezicula tracheiphila</i> o <i>Isariopsis leaf spot</i>. Provoca manchas necróticas de color marrón-rojizo, a menudo angulares y delimitadas por las nervaduras de la hoja. Puede haber un halo amarillento.</p>
+                    </div>
+
+                    <div class="disease-card" data-disease="healthy">
+                        <div class="disease-image"><i class="fas fa-check-circle" style="color: var(--success-color);"></i></div>
+                        <h4>Sana (Healthy)</h4>
+                        <p>La hoja no presenta síntomas visuales de las enfermedades analizadas. Muestra una coloración verde uniforme y una textura saludable, sin manchas, decoloraciones o deformaciones significativas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section about-grapeai">
+                    <h4><i class="fas fa-leaf"></i> GrapeAI</h4>
+                    <p>Una herramienta inteligente para la viticultura moderna, potenciando la detección temprana de enfermedades en vides mediante la Inteligencia Artificial.</p>
+                </div>
+                <div class="footer-section tech-stack">
+                    <h4>Tecnologías Clave</h4>
+                    <ul>
+                        <li><a href="https://flask.palletsprojects.com/" target="_blank" rel="noopener noreferrer">Flask</a> (Backend)</li>
+                        <li><a href="https://www.tensorflow.org/" target="_blank" rel="noopener noreferrer">TensorFlow/Keras</a> (CNN)</li>
+                        <li><a href="https://opencv.org/" target="_blank" rel="noopener noreferrer">OpenCV</a> (Procesamiento Img.)</li>
+                        <li><a href="https://scikit-learn.org/" target="_blank" rel="noopener noreferrer">Scikit-learn</a> (Árbol Decisión)</li>
+                        <li><a href="https://vincentgarreau.com/particles.js/" target="_blank" rel="noopener noreferrer">Particles.js</a> (Animación)</li>
+                    </ul>
+                </div>
+                <div class="footer-section contact-info">
+                    <h4>Contacto y Recursos</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:contacto@grapeai.tech">contacto@grapeai.tech</a></li>
+                        <li><i class="fas fa-globe"></i> <a href="https://grapeai.tech" target="_blank" rel="noopener noreferrer">grapeai.tech</a> (Sitio Ejemplo)</li>
+                        <li><i class="fas fa-book-open"></i> <a href="#about">Documentación del Sistema</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© <span id="currentYear">2024</span> GrapeAI. Todos los derechos reservados. Un proyecto de IA con fines educativos y de demostración.</p>
+            </div>
+        </div>
+    </footer>
+    <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+Flask==2.3.3
+gunicorn # ¡ESENCIAL para Render!
+numpy==1.26.4 # O la versión que usaste con Python 3.11 y TF
+opencv-python-headless==4.8.0.76 # headless es más ligero
+scikit-image==0.20.0 # O la versión que te funcionó con 3.11
+scikit-learn==1.4.2  # O la versión que usaste
+scipy==1.11.4        # O la versión compatible
+tensorflow-cpu==2.15.0 # O la última versión de TF-CPU compatible con Python 3.11
+                       # TF 2.13 es compatible con Python <=3.11
+                       # TF 2.15 es compatible con Python <=3.11
+                       # TF 2.16+ podría requerir Python 3.9-3.11 pero no más nuevos.
+                       # ¡Verifica la compatibilidad de TF con tu Python!
+
+# Dependencias que TensorFlow-CPU podría necesitar explícitamente a veces:
+absl-py
+astunparse
+flatbuffers
+gast
+google-pasta
+grpcio
+h5py
+keras # Solo si importas 'keras' directamente y no 'tensorflow.keras'. TF 2.15 ya tiene Keras 3.
+libclang # Si alguna dependencia lo necesita indirectamente, aunque es raro para inferencia.
+Markdown # Solo si Flask o alguna extensión lo usa para algo.
+MarkupSafe
+ml-dtypes
+opt_einsum
+packaging
+protobuf # TF suele requerir una versión específica o un rango.
+six
+termcolor
+typing_extensions
+Werkzeug # Flask lo necesita.
+wrapt
+# Considera quitar las que no sean estrictamente necesarias para la inferencia
+# por ejemplo, matplotlib, seaborn, kagglehub, pydotplus, graphviz
+# a menos que generes gráficos en el servidor, lo cual no parece ser el caso.
