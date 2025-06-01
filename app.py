@@ -18,6 +18,7 @@ from skimage.segmentation import slic
 from skimage.measure import regionprops # 'label' no se usa directamente en analisis_avanzado_pixeles_local
 from skimage.morphology import disk, opening # 'closing' no se usa
 from scipy import ndimage
+from expert_system_class import SistemaExpertoAvanzado # ASUMIENDO que el archivo se llama expert_system_class.py
 
 # --- Variables Globales y Configuración ---
 app = Flask(__name__)
@@ -36,87 +37,6 @@ feature_scaler_global = None
 mapeo_clases_global = None
 feature_names_list_global = None
 
-# --- Definición de la clase SistemaExpertoAvanzado ---
-class SistemaExpertoAvanzado:
-    def __init__(self, feature_names):
-        self.reglas = []
-        self.feature_names = feature_names
-        self.inicializar_reglas_avanzadas()
-
-    def inicializar_reglas_avanzadas(self):
-        self.reglas.append({
-            'nombre': 'Black Rot',
-            'condiciones': {
-                'black_pixel_ratio_min': 0.05, 'rgb_std_0_min': 40,
-                'contrast_mean_min': 0.2, 'edge_density_canny_min': 0.08,
-            }, 'confianza': 0.80
-        })
-        self.reglas.append({
-            'nombre': 'Esca (Black Measles)',
-            'condiciones': {
-                'esca_pixel_ratio_min': 0.03, 'hsv_mean_0_min': 15,
-                'hsv_mean_0_max': 35, 'homogeneity_mean_max': 0.7,
-                'num_regions_min': 15,
-            }, 'confianza': 0.75
-        })
-        self.reglas.append({
-            'nombre': 'Leaf Blight (Isariopsis Leaf Spot)',
-            'condiciones': {
-                'blight_pixel_ratio_min': 0.02, 'rgb_mean_0_min': 100,
-                'dissimilarity_mean_min': 0.3, 'gabor_0_min': 0.05, # Asume que 'gabor_0' es una feature real
-            }, 'confianza': 0.70
-        })
-        self.reglas.append({
-            'nombre': 'Healthy',
-            'condiciones': {
-                'healthy_pixel_ratio_min': 0.35, 'rgb_mean_1_min': 90,
-                'hsv_mean_0_min': 38, 'hsv_mean_0_max': 85,
-                'homogeneity_mean_min': 0.6, 'num_regions_max': 40
-            }, 'confianza': 0.85
-        })
-
-    def evaluar_condiciones(self, features_dict, condiciones_regla):
-        for param_key, valor_limite in condiciones_regla.items():
-            feature_name_base = param_key.rsplit('_', 1)[0] if param_key.endswith(('_min', '_max')) else param_key
-            if feature_name_base not in features_dict:
-                # print(f"Advertencia SE: Característica '{feature_name_base}' no encontrada para regla.")
-                return False
-            valor_actual = features_dict[feature_name_base]
-            if param_key.endswith('_min') and valor_actual < valor_limite: return False
-            if param_key.endswith('_max') and valor_actual > valor_limite: return False
-        return True
-
-    def diagnosticar(self, features_list_ordered):
-        if not self.feature_names:
-            print("Error SE: Nombres de características no inicializados en SistemaExperto.")
-            return [{'enfermedad': 'Error Interno SE', 'confianza': 0.0, 'regla_activada': 'Config Error'}]
-        if len(features_list_ordered) != len(self.feature_names):
-            # print(f"Error SE: Discrepancia en número de features. Esperadas {len(self.feature_names)}, recibidas {len(features_list_ordered)}")
-            return [{'enfermedad': 'Error en Features SE', 'confianza': 0.1, 'regla_activada': 'Input Mismatch'}]
-
-        features_dict = dict(zip(self.feature_names, features_list_ordered))
-        resultados = []
-        for regla in self.reglas:
-            if self.evaluar_condiciones(features_dict, regla['condiciones']):
-                resultados.append({'enfermedad': regla['nombre'], 'confianza': regla['confianza'], 'regla_activada': regla['nombre']})
-
-        if not resultados: # Fallback si ninguna regla principal se activa
-            default_disease = 'Indeterminado'
-            default_confidence = 0.20 # Confianza base para indeterminado
-            # Lógica de fallback más específica
-            if features_dict.get('healthy_pixel_ratio', 0) > 0.35 and features_dict.get('black_pixel_ratio', 0) < 0.02 :
-                 default_disease, default_confidence = 'Healthy', 0.45
-            elif features_dict.get('black_pixel_ratio', 0) > 0.05:
-                 default_disease, default_confidence = 'Black Rot', 0.40
-            elif features_dict.get('esca_pixel_ratio', 0) > 0.03:
-                 default_disease, default_confidence = 'Esca (Black Measles)', 0.35
-            elif features_dict.get('blight_pixel_ratio', 0) > 0.02:
-                 default_disease, default_confidence = 'Leaf Blight (Isariopsis Leaf Spot)', 0.35
-
-            resultados.append({'enfermedad': default_disease, 'confianza': default_confidence, 'regla_activada': 'default_fallback_rule'})
-
-        resultados.sort(key=lambda x: x['confianza'], reverse=True)
-        return resultados
 
 def cargar_todos_los_modelos():
     global modelo_cnn_global, modelo_arbol_decision_global, sistema_experto_global, \
